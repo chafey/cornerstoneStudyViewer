@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <!-- support for mobile touch devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1, minimal-ui">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="cornerstone.min.css" rel="stylesheet">
+</head>
+<style>
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+
+
+    #container{width:100%;}
+    #left{float:left;width:200px;}
+    #right{float:right;;}
+    #center{margin:0 auto;width:400px;}
+
+
+    #studyContainer {
+        height: 100%;
+        overflow: hidden;
+        border-top: 30px solid black;
+    }
+
+    #thumbnailSelector {
+        float: left;
+        width: 123px; /*Width of left column*/
+        margin-left: -100%;
+        height:100%;
+        overflow:auto; /* enable scrolling of thumbnails */
+        overflow-y:scroll;
+    }
+
+    #thumbnails {
+    }
+
+    a.list-group-item {
+        background-color: black;
+        padding: 2px;
+    }
+
+
+    .csthumbnail {
+        color: white;
+        background-color:black;
+        width:100px;
+        height:100px;
+        border: 0px;
+        padding: 0px;
+    }
+
+    #viewer {
+        float: left;
+        width: 100%;
+        height:100%;
+        overflow: hidden;
+    }
+
+    #viewer-inner{
+        margin-left: 123px; /*Set left margin to LeftColumnWidth*/
+        height:100%;
+    }
+
+    .imageViewer {
+        height: 100%;
+        border: 30px;
+    }
+
+    .viewport {
+        width:100%;
+        height:100%;
+        top:0px;
+        left:0px;
+        position:absolute
+    }
+
+    .overlay {
+        position: absolute;
+        color: #e4ad00;
+    }
+
+
+</style>
+<body>
+<div id="header" style="position:fixed;width:100%;height:30px;">
+    <div id="container">
+        <div id="left" style="">
+            <a class="" href="https://github.com/chafey/cornerstone">Cornerstone Study Viewer</a>
+        </div>
+        <div id="right" class="">
+            <a id="help" href="#" class="button">Help</a>
+            <a id="about" href="#" class="button">About</a>
+        </div>
+        <div id="center">
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="WW/WC"><span class="fa fa-sun-o"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Invert"><span class="fa fa-adjust"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Zoom"><span class="fa fa-search"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Pan"><span class="fa fa-arrows"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Stack Scroll"><span class="fa fa-bars"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Length Measurement"><span class="fa fa-arrows-v"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Angle Measurement"><span class="fa fa-angle-left"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Pixel Probe"><span class="fa fa-dot-circle-o"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Elliptical ROI"><span class="fa fa-circle-o"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Rectangle ROI"><span class="fa fa-square-o"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Play Clip"><span class="fa fa-play"></span></button>
+                <button type="button" class="btn btn-sm btn-default" data-container='body' data-toggle="tooltip" data-placement="bottom" title="Stop Clip"><span class="fa fa-stop"></span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="studyContainer" class="studyContainer" style="">
+    <div id="viewer">
+        <div id="viewer-inner">
+            <div class="imageViewer">
+                <div class="viewportWrapper" style="width:100%;height:100%;position:relative;color: white;display:inline-block;background-color:black;"
+                     oncontextmenu="return false"
+                     class='cornerstone-enabled-image'
+                     unselectable='on'
+                     onselectstart='return false;'
+                     onmousedown='return false;'>
+                    <div class="viewport">
+                    </div>
+                    <div class="overlay" style="top:0px; left:0px">
+                        <div>Patient Name</div>
+                        <div>Patient Id</div>
+                    </div>
+                    <div class="overlay" style="top:0px; right:0px">
+                        <div>Study Description</div>
+                        <div>Study Date</div>
+                    </div>
+
+                    <div class="overlay" style="bottom:0px; left:0px">
+                        <div class="fps">FPS:</div>
+                        <div class="renderTime">Render Time:</div>
+                        <div class="currentImageAndTotalImages">Image #:</div>
+                    </div>
+                    <div class="overlay" style="bottom:0px; right:0px">
+                        <div>Zoom:</div>
+                        <div>WW/WC:</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="thumbnailSelector">
+        <div id="thumbnails" class="list-group">
+        </div>
+    </div>
+</div>
+
+<div>
+    <script src="jquery.min.js"></script>
+
+    <script src="jquery.hammer-full.js"></script>
+
+
+    <script src="bootstrap.min.js" ></script>
+
+    <!-- include the cornerstone library -->
+    <script src="cornerstone.min.js"></script>
+
+    <!-- include the cornerstone library -->
+    <script src="cornerstoneMath.min.js"></script>
+
+    <!-- include the cornerstone tools library -->
+    <script src="cornerstoneTools.min.js"></script>
+
+    <!-- include the cornerstoneWADOImageLoader library -->
+    <script src="cornerstoneWADOImageLoader.min.js"></script>
+
+    <!-- include the dicomParser library -->
+    <script src="dicomParser.min.js"></script>
+
+    <script src="imageViewer.js"></script>
+    <script src="studyParser.js"></script>
+    <script src="thumbnails.js"></script>
+
+</div>
+
+
+<script>
+    var studyId =  location.search.split('studyId=')[1];
+    $.getJSON('/cornerstone/study/' + studyId, function(data) {
+        var stacks = parseStudy(data);
+
+        var context = {
+            study: data,
+            stacks: stacks,
+            viewports: [
+                {
+                    element: undefined,
+                    stackIndex: 0
+                }
+            ]
+        }
+
+        loadThumbnails(context);
+        initializeViewportWithStack(context, 0, 0);
+    });
+</script>
+
+</body>
+</html>
