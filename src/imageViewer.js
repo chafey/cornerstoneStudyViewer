@@ -1,23 +1,53 @@
+function setOverlays(context, viewportIndex, stackIndex)
+{
+    var viewport = context.viewports[viewportIndex];
+    var stack = context.stacks[stackIndex];
+    var element = $('.viewport')[viewportIndex];
+    var parent = $(element).parent();
+    var childDivs = $(parent).find('.overlay');
+    var topLeft = $(childDivs[0]).find('div');
+    var topRight= $(childDivs[1]).find('div');
+    $(topRight[0]).text(stack.series.seriesDescription);
+    $(topRight[1]).text(stack.series.protocolName);
+    $(topRight[2]).text(stack.series.bodyPartExamined);
+    var bottomLeft = $(childDivs[2]).find('div');
+    var bottomRight = $(childDivs[3]).find('div');
+}
+
 function initializeViewportWithStack(context, viewportIndex, stackIndex)
 {
     var viewport = context.viewports[viewportIndex];
     var stack = context.stacks[stackIndex];
 
+    setOverlays(context, viewportIndex, stackIndex);
     // image enable the dicomImage element and activate a few tools
     var element = $('.viewport')[viewportIndex];
     var parent = $(element).parent();
     var childDivs = $(parent).find('.overlay');
     var topLeft = $(childDivs[0]).find('div');
     $(topLeft[0]).text(context.study.patientName);
-    $(topLeft[1]).text(context.study.patientId);
+    $(topLeft[1]).text("PID:" + context.study.patientID);
+    $(topLeft[2]).text("Accession # " + context.study.accessionNumber);
+    $(topLeft[3]).text("StudyId # " + context.study.studyId);
+    $(topLeft[4]).text(context.study.studyDescription);
+    $(topLeft[5]).text(context.study.studyDate + " " + context.study.studyTime);
+    /*
     var topRight= $(childDivs[1]).find('div');
     $(topRight[0]).text(context.study.studyDescription);
-    $(topRight[1]).text(context.study.studyDate);
+    $(topRight[1]).text(context.study.studyDate + " " + context.study.studyTime);
+    $(topRight[2]).text(stack.series.seriesDescription);
+    $(topRight[3]).text(stack.series.protocolName);
+    $(topRight[4]).text(stack.series.bodyPartExamined);
+    */
     var bottomLeft = $(childDivs[2]).find('div');
     var bottomRight = $(childDivs[3]).find('div');
-
     viewport.element = element;
     viewport.stackIndex = stackIndex;
+
+    $(window).resize(function() {
+        cornerstone.resize(element, true);
+    });
+
 
     function onNewImage(e) {
         // if we are currently playing a clip then update the FPS
@@ -50,8 +80,9 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
 
         // start playing the clip if a framerate is provided
         if(stack.frameRate !== undefined) {
-            cornerstone.playClip(element, stack.frameRate);
+            cornerstoneTools.playClip(element, stack.frameRate);
         }
+
 
         cornerstoneTools.mouseInput.enable(element);
         cornerstoneTools.mouseWheelInput.enable(element);
@@ -175,9 +206,13 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
 
 function displayStackInViewport(context, stackIndex, viewportIndex)
 {
+    var viewport = context.viewports[viewportIndex];
+    var element = viewport.element;//$('.viewport')[viewportIndex];
+    cornerstoneTools.stopClip(element);
+
     cornerstone.loadAndCacheImage(context.stacks[stackIndex].imageIds[0]).then(function(image) {
-        var viewport = context.viewports[viewportIndex];
-        var element = viewport.element;//$('.viewport')[viewportIndex];
+
+
         var defViewport = cornerstone.getDefaultViewport(element, image);
         viewport.stackIndex = stackIndex;
         cornerstone.displayImage(element, image, defViewport);
@@ -190,5 +225,10 @@ function displayStackInViewport(context, stackIndex, viewportIndex)
         if(context.stacks[stackIndex].frameRate !== undefined) {
             cornerstoneTools.playClip(element, context.stacks[stackIndex].frameRate);
         }
+
+        setOverlays(context, viewportIndex, stackIndex);
     });
 }
+
+
+

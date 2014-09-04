@@ -4,30 +4,56 @@ function parseStudy(study)
     var currentStackIndex = 0;
     var seriesIndex = 0;
     study.seriesList.forEach(function(series) {
+
+        var seriesDescription = series.seriesDescription;
+
+        if(seriesDescription === "" || seriesDescription == "(null)") {
+            seriesDescription = series.protocolName;
+        }
+        if(seriesDescription === "" || seriesDescription == "(null)") {
+            seriesDescription = "S:" + series.seriesNumber;
+            if(series.instanceList.length === 1) {
+                seriesDescription += "/I:" + series.instanceList[0].instanceNumber;
+            }
+        }
+
         var stack = {
-            seriesDescription: series.seriesDescription,
+            series: series,
+            seriesDescription: seriesDescription,
             stackId : series.seriesNumber,
             imageIds: [],
             currentImageIdIndex: 0,
             frameRate: series.frameRate
         }
-        if(series.numberOfFrames !== undefined) {
-            var numberOfFrames = series.numberOfFrames;
-            for(var i=0; i < numberOfFrames; i++) {
-                var imageId = series.instanceList[0].imageId + "?frame=" + i;
-                if(imageId.substr(0, 4) !== 'http') {
-                    imageId = "dicomweb:/instances/" + imageId + '/file';
-                }
-                stack.imageIds.push(imageId);
-            }
-        } else {
-            series.instanceList.forEach(function(image) {
-                var imageId = image.imageId;
+
+        series.instanceList.forEach(function(image) {
+            var imageId = image.imageId;
+            if(image.numberOfFrames === undefined) {
                 if(image.imageId.substr(0, 4) !== 'http') {
                     imageId = "dicomweb:/instances/" + image.imageId + '/file';
                 }
-                stack.imageIds.push(imageId);
-            });
+            }
+            else {
+                for(var i=0; i < image.numberOfFrames; i++) {
+                    if(imageId.substr(0, 4) !== 'http') {
+                        imageId = "dicomweb:/instances/" + image.imageId + '/file' + "?frame=" + i;
+                    }
+                    stack.imageIds.push(imageId);
+                }
+                if(image.frameRate !== undefined)
+                {
+                    stack.frameRate = image.frameRate;
+                }
+            }
+            stack.imageIds.push(imageId);
+        });
+
+        if(stack.frameRate !== undefined) {
+            stack.seriesDescription += "(clip)"
+        }
+
+        if(stack.imageIds.length > 1) {
+            stack.seriesDescription += " (" + stack.imageIds.length + ")";
         }
         seriesIndex++;
         stacks.push(stack);

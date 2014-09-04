@@ -13,30 +13,35 @@ module.exports = function(grunt) {
             }
         },
         copy : {
-            src: {
+            srchtml: {
                 src: [
                     'src/index.html',
+                    'src/studyViewer.html'
+                ],
+                dest: 'build/debug/web',
+                expand: true,
+                flatten: true
+            },
+            srcjs: {
+                src: [
                     'src/studyParser.js',
-                    'src/studyViewer.html',
                     'src/thumbnails.js',
                     'src/imageViewer.js',
-                    'src/architecture.html',
                     'src/dialogs.js'
                 ],
-                dest: 'build',
+                dest: 'build/debug/web/js',
                 expand: true,
                 flatten: true
             },
-            lib: {
+            srccss: {
                 src: [
-                    'lib/jquery.hammer-full.js',
-                    'lib/bootstrap.min.css'
+                    'src/studyViewer.css'
                 ],
-                dest: 'build',
+                dest: 'build/debug/web/css',
                 expand: true,
                 flatten: true
             },
-            fonts: {
+            libfonts: {
                 src: [
                     'bower_components/font-awesome/fonts/FontAwesome.otf',
                     'bower_components/font-awesome/fonts/fontawesome-webfont.eot',
@@ -44,24 +49,25 @@ module.exports = function(grunt) {
                     'bower_components/font-awesome/fonts/fontawesome-webfont.ttf',
                     'bower_components/font-awesome/fonts/fontawesome-webfont.woff'
                 ],
-                dest: 'build/fonts',
+                dest: 'build/debug/web/fonts',
                 expand: true,
                 flatten: true
             },
-            css: {
+            libcss: {
                 src: [
+                    'bower_components/cornerstone/dist/cornerstone.min.css',
+                    'lib/bootstrap.min.css',
                     'bower_components/font-awesome/css/font-awesome.css',
                     'bower_components/font-awesome/css/font-awesome.min.css'
                 ],
-                dest: 'build/css',
+                dest: 'build/debug/web/css',
                 expand: true,
                 flatten: true
             },
-
-            bower: {
+            libjs: {
                 src: [
+                    'lib/jquery.hammer-full.js',
                     'bower_components/bootstrap/dist/js/bootstrap.min.js',
-                    'bower_components/cornerstone/dist/cornerstone.min.css',
                     'bower_components/cornerstone/dist/cornerstone.min.js',
                     'bower_components/cornerstoneTools/dist/cornerstoneTools.min.js',
                     'bower_components/cornerstoneWADOImageLoader/dist/cornerstoneWADOImageLoader.min.js',
@@ -71,10 +77,11 @@ module.exports = function(grunt) {
                     'bower_components/jquery/dist/jquery.min.js',
                     'bower_components/jquery/dist/jquery.min.map'
                 ],
-                dest: 'build',
+                dest: 'build/debug/web/js',
                 expand: true,
                 flatten: true
             }
+
         },
         build: {
 
@@ -89,8 +96,8 @@ module.exports = function(grunt) {
 
     require('load-grunt-tasks')(grunt);
 
-    grunt.registerTask('buildDebug', ['copy:src']);
-    grunt.registerTask('copylib', ['copy:bower', 'copy:lib', 'copy:fonts', 'copy:css']);
+    grunt.registerTask('buildDebug', ['copy:srchtml', 'copy:srcjs', 'copy:srccss']);
+    grunt.registerTask('copylib', ['copy:libjs', 'copy:libcss', 'copy:libfonts']);
     grunt.registerTask('buildAll', ['clean', 'copylib', 'buildDebug']);
     grunt.registerTask('default', ['buildAll']);
 };
