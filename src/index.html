@@ -157,11 +157,11 @@
         data.studyList.forEach(function(study) {
             var studyRow = '<tr><td>' +
                     study.patientName + '</td><td>' +
-                    study.patientId + '</td><td>' +
+                    study.patientID + '</td><td>' +
                     study.studyDate + '</td><td>' +
-                    study.modality + '</td><td>' +
+                    study.modalities + '</td><td>' +
                     study.studyDescription + '</td><td>' +
-                    study.numImages + '</td><td>' +
+                    study.numSopInstances + '</td><td>' +
                     '</tr>';
             var studyRowElement = $(studyRow).appendTo('#studyListData');
             $(studyRowElement).click(function() {
