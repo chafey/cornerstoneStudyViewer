@@ -1,3 +1,24 @@
+function getStackValue(stack, tag)
+{
+    var value;
+    value = stack.instances[stack.currentImageIdIndex][tag];
+    if(value !== undefined)
+    {
+        return value;
+    }
+    value = stack.series.SharedTags[tag];
+    if(value !== undefined)
+    {
+        return value;
+    }
+    value = stack.study.SharedTags[tag];
+    if(value !== undefined)
+    {
+        return value;
+    }
+    return "";
+}
+
 function setOverlays(context, viewportIndex, stackIndex)
 {
     var viewport = context.viewports[viewportIndex];
@@ -7,9 +28,10 @@ function setOverlays(context, viewportIndex, stackIndex)
     var childDivs = $(parent).find('.overlay');
     var topLeft = $(childDivs[0]).find('div');
     var topRight= $(childDivs[1]).find('div');
-    $(topRight[0]).text(stack.series.seriesDescription);
-    $(topRight[1]).text(stack.series.protocolName);
-    $(topRight[2]).text(stack.series.bodyPartExamined);
+    $(topRight[0]).text(getStackValue(stack, "x0008103E")); // series description
+    $(topRight[1]).text("Series # " + getStackValue(stack, "x00200011")); // series number
+    $(topRight[2]).text(getStackValue(stack, "x00181030")); // protocol name
+    $(topRight[3]).text(getStackValue(stack, "x00180015")); // body part examined
     var bottomLeft = $(childDivs[2]).find('div');
     var bottomRight = $(childDivs[3]).find('div');
 }
@@ -25,29 +47,21 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
     var parent = $(element).parent();
     var childDivs = $(parent).find('.overlay');
     var topLeft = $(childDivs[0]).find('div');
-    $(topLeft[0]).text(context.study.patientName);
-    $(topLeft[1]).text("PID:" + context.study.patientID);
-    $(topLeft[2]).text("Accession # " + context.study.accessionNumber);
-    $(topLeft[3]).text("StudyId # " + context.study.studyId);
-    $(topLeft[4]).text(context.study.studyDescription);
-    $(topLeft[5]).text(context.study.studyDate + " " + context.study.studyTime);
-    /*
-    var topRight= $(childDivs[1]).find('div');
-    $(topRight[0]).text(context.study.studyDescription);
-    $(topRight[1]).text(context.study.studyDate + " " + context.study.studyTime);
-    $(topRight[2]).text(stack.series.seriesDescription);
-    $(topRight[3]).text(stack.series.protocolName);
-    $(topRight[4]).text(stack.series.bodyPartExamined);
-    */
+    $(topLeft[0]).text(getStackValue(stack, "x00100010")); // patient name
+    $(topLeft[1]).text("PID:" + getStackValue(stack, "x00100020")); // patient id
+    $(topLeft[2]).text("Acc # " + getStackValue(stack, "x00080050")); // accession number
+    $(topLeft[4]).text(getStackValue(stack, "x00081030")); // study description
+    $(topLeft[5]).text(getStackValue(stack, "x00080020") + " " + getStackValue(stack, "x00080030"));
+
     var bottomLeft = $(childDivs[2]).find('div');
     var bottomRight = $(childDivs[3]).find('div');
     viewport.element = element;
     viewport.stackIndex = stackIndex;
 
+    // tell cornerstone to resize the enabled element if the window size changes
     $(window).resize(function() {
         cornerstone.resize(element, true);
     });
-
 
     function onNewImage(e) {
         // if we are currently playing a clip then update the FPS
@@ -60,6 +74,9 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
             }
         }
         $(bottomLeft[2]).text("Image #" + (context.stacks[viewport.stackIndex].currentImageIdIndex + 1) + "/" + context.stacks[viewport.stackIndex].imageIds.length);
+        var stack = context.stacks[viewport.stackIndex];
+        var instanceNum = getStackValue(stack, "x00200013");
+        $(bottomLeft[3]).text("Instance #" + instanceNum);
     }
     element.addEventListener("CornerstoneNewImage", onNewImage, false);
 
@@ -77,11 +94,6 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
     cornerstone.loadAndCacheImage(imageId).then(function(image) {
         cornerstone.displayImage(element, image);
 
-        // start playing the clip if a framerate is provided
-        if(stack.frameRate !== undefined) {
-            cornerstoneTools.playClip(element, stack.frameRate);
-        }
-
 
         cornerstoneTools.mouseInput.enable(element);
         cornerstoneTools.mouseWheelInput.enable(element);
@@ -98,13 +110,11 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
         cornerstoneTools.wwwcTouchDrag.activate(element);
         cornerstoneTools.zoomTouchPinch.activate(element);
 
-
         // stack tools
         cornerstoneTools.addStackStateManager(element, ['playClip']);
         cornerstoneTools.addToolState(element, 'stack', stack);
         cornerstoneTools.stackScrollWheel.activate(element);
         cornerstoneTools.stackPrefetch.enable(element);
-
 
         function disableAllTools()
         {
@@ -182,7 +192,7 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
                 frameRate = 10;
             }
             cornerstoneTools.stackPrefetch.disable(element);
-            cornerstoneTools.playClip(element, 31);
+            cornerstoneTools.playClip(element, frameRate);
         });
         $(buttons[11]).on('click touchstart',function() {
             cornerstoneTools.stopClip(element);
@@ -200,6 +210,12 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
         $(buttons[9]).tooltip();
         $(buttons[10]).tooltip();
         $(buttons[11]).tooltip();
+
+        // start playing the clip if a framerate is provided
+        if(stack.frameRate !== undefined) {
+            cornerstoneTools.playClip(element, stack.frameRate);
+        }
+
     });
 
 }
@@ -211,8 +227,6 @@ function displayStackInViewport(context, stackIndex, viewportIndex)
     cornerstoneTools.stopClip(element);
 
     cornerstone.loadAndCacheImage(context.stacks[stackIndex].imageIds[0]).then(function(image) {
-
-
         var defViewport = cornerstone.getDefaultViewport(element, image);
         viewport.stackIndex = stackIndex;
         cornerstone.displayImage(element, image, defViewport);
