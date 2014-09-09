@@ -54,30 +54,33 @@
                      onselectstart='return false;'
                      onmousedown='return false;'>
                     <div class="viewport">
+                        <div id="loadingMessage">
+                            Loading study, please wait...
+                        </div>
                     </div>
                     <div class="overlay" style="top:0px; left:0px">
-                        <div>Patient ID</div>
-                        <div>Patient Name</div>
-                        <div>Accession #</div>
-                        <div>Study Description</div>
-                        <div>Study Date/Time</div>
+                        <div class="overlayText">Patient ID</div>
+                        <div class="overlayText">Patient Name</div>
+                        <div class="overlayText">Accession #</div>
+                        <div class="overlayText">Study Description</div>
+                        <div class="overlayText">Study Date/Time</div>
                     </div>
                     <div class="overlay" style="top:0px; right:0px">
-                        <div>Series Description</div>
-                        <div>Series #</div>
-                        <div>Protocol</div>
-                        <div>Body Part</div>
+                        <div class="overlayText">Series Description</div>
+                        <div class="overlayText">Series #</div>
+                        <div class="overlayText">Protocol</div>
+                        <div class="overlayText">Body Part</div>
                     </div>
 
                     <div class="overlay" style="bottom:0px; left:0px">
-                        <div class="fps">FPS:</div>
-                        <div class="renderTime">Render Time:</div>
-                        <div class="seriesAndInstanceNum">Se:1 Im: 1</div>
-                        <div class="currentImageAndTotalImages">Image #:</div>
+                        <div class="fps overlayText">FPS:</div>
+                        <div class="renderTime overlayText">Render Time:</div>
+                        <div class="seriesAndInstanceNum overlayText">Se:1 Im: 1</div>
+                        <div class="currentImageAndTotalImages overlayText">Image #:</div>
                     </div>
                     <div class="overlay" style="bottom:0px; right:0px">
-                        <div>Zoom:</div>
-                        <div>WW/WC:</div>
+                        <div class="overlayText">Zoom:</div>
+                        <div class="overlayText">WW/WC:</div>
                     </div>
                 </div>
             </div>
@@ -188,6 +191,8 @@
         console.log("normalized study took" + (stop - start) + " ms");
         var stacks = parseNormalizedStudy(data);
 
+        $('#loadingMessage').remove();
+
         $("TITLE").text(data.SharedTags.x00100010);
 
         var context = {
@@ -203,6 +208,11 @@
 
         initializeViewportWithStack(context, 0, 0);
         loadThumbnails(context);
+    })
+    .error(function()
+    {
+        $('#loadingMessage').text("Error loading study");
+
     });
 
 </script>

@@ -50,8 +50,8 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
     $(topLeft[0]).text(getStackValue(stack, "x00100010")); // patient name
     $(topLeft[1]).text("PID:" + getStackValue(stack, "x00100020")); // patient id
     $(topLeft[2]).text("Acc # " + getStackValue(stack, "x00080050")); // accession number
-    $(topLeft[4]).text(getStackValue(stack, "x00081030")); // study description
-    $(topLeft[5]).text(getStackValue(stack, "x00080020") + " " + getStackValue(stack, "x00080030"));
+    $(topLeft[3]).text(getStackValue(stack, "x00081030")); // study description
+    $(topLeft[4]).text(getStackValue(stack, "x00080020") + " " + getStackValue(stack, "x00080030"));
 
     var bottomLeft = $(childDivs[2]).find('div');
     var bottomRight = $(childDivs[3]).find('div');
@@ -88,6 +88,9 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
     element.addEventListener("CornerstoneImageRendered", onImageRendered, false);
 
     var imageId = stack.imageIds[0];
+
+    // remove the hide-text class
+    $('.overlayText').css("visibility", "visible");
 
     // image enable the dicomImage element
     cornerstone.enable(element);
