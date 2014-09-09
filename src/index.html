@@ -45,7 +45,7 @@
     <nav class="myNav navbar navbar-default" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
-                <span class="navbar-brand" href="https://github.com/chafey/cornerstone">DICOM Study Viewer</span>
+                <img src="images/Luryw-46px%20high.png" style="margin-left:-15px; margin-top:2px;"></a>
             </div>
             <ul class="nav navbar-nav navbar-right">
                 <li><a id="help" href="#" class="button hidden-xs">Help</a></li>
@@ -59,6 +59,7 @@
             <table  class="col-md-12 table table-striped">
                 <thead>
                 <tr>
+                    <th style="width:60px">Status</th>
                     <th>Patient Name</th>
                     <th>Patient ID</th>
                     <th>Study Date</th>
@@ -149,8 +150,18 @@
     $.getJSON('/cornerstone/studyList', function(data)
     {
         data.studyList.forEach(function(study) {
-            var studyRow = '<tr><td>' +
-                    study.patientName + '</td><td>' +
+
+            var studyRow = '<tr><td>';
+
+            if(study.isReady === false)
+            {
+                studyRow += '<i class="fa fa-spinner"></i></td><td>';
+            } else {
+                studyRow += '</td><td>';
+            }
+
+            studyRow +=
+                    study.patientName + '</i></td><td>' +
                     study.patientID + '</td><td>' +
                     study.studyDate + '</td><td>' +
                     study.modalities + '</td><td>' +
@@ -159,7 +170,12 @@
                     '</tr>';
             var studyRowElement = $(studyRow).appendTo('#studyListData');
             $(studyRowElement).click(function() {
-                window.open('studyViewer.html?studyId=' + study.studyViewerId);
+                if(study.isReady !== false) {
+                    window.open('studyViewer.html?studyId=' + study.studyViewerId);
+                }
+                else {
+                    alert("This study is being processed and cannot be opened yet, please refresh browser after the study has been received");
+                }
             });
         });
     });

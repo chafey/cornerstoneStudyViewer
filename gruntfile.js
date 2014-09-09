@@ -42,6 +42,15 @@ module.exports = function(grunt) {
                 expand: true,
                 flatten: true
             },
+            srcimages: {
+                src: [
+                    'src/Luryw-46px high.png'
+                ],
+                dest: 'build/debug/web/images',
+                expand: true,
+                flatten: true
+            },
+
             libfonts: {
                 src: [
                     'bower_components/font-awesome/fonts/FontAwesome.otf',
@@ -97,7 +106,7 @@ module.exports = function(grunt) {
 
     require('load-grunt-tasks')(grunt);
 
-    grunt.registerTask('buildDebug', ['copy:srchtml', 'copy:srcjs', 'copy:srccss']);
+    grunt.registerTask('buildDebug', ['copy:srchtml', 'copy:srcjs', 'copy:srccss', "copy:srcimages"]);
     grunt.registerTask('copylib', ['copy:libjs', 'copy:libcss', 'copy:libfonts']);
     grunt.registerTask('buildAll', ['clean', 'copylib', 'buildDebug']);
     grunt.registerTask('default', ['buildAll']);
