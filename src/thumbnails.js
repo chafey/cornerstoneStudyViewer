@@ -29,6 +29,8 @@ function loadThumbnails(context)
         }
 
         $(seriesElement).on('click touchstart', function () {
+            var element = $('.viewport')[0];
+            cornerstoneTools.stackPrefetch.disable(element);
             // make this series visible
             var activeThumbnails = $(seriesList).find('a').each(function() {
                 $(this).removeClass('active');

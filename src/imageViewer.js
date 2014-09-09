@@ -53,8 +53,7 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
         // if we are currently playing a clip then update the FPS
         var playClipToolData = cornerstoneTools.getToolState(element, 'playClip');
         if(playClipToolData !== undefined && playClipToolData.data.length > 0 && playClipToolData.data[0].intervalId !== undefined && e.detail.frameRate !== undefined) {
-            $(bottomLeft[0]).text("FPS: " + Math.round(e.detail.frameRate));
-            //console.log('frameRate: ' + e.detail.frameRate);
+            $(bottomLeft[0]).text("FPS: " + Math.round(playClipToolData.data[0].framesPerSecond) + " (" + Math.round(e.detail.frameRate) + ")");
         } else {
             if($(bottomLeft[0]).text().length > 0) {
                 $(bottomLeft[0]).text("");
@@ -182,6 +181,7 @@ function initializeViewportWithStack(context, viewportIndex, stackIndex)
             if(frameRate === undefined) {
                 frameRate = 10;
             }
+            cornerstoneTools.stackPrefetch.disable(element);
             cornerstoneTools.playClip(element, 31);
         });
         $(buttons[11]).on('click touchstart',function() {
@@ -220,10 +220,13 @@ function displayStackInViewport(context, stackIndex, viewportIndex)
         var stackState = cornerstoneTools.getToolState(element, 'stack');
         stackState.data[0] = context.stacks[stackIndex];
         stackState.data[0].currentImageIdIndex = 0;
-        cornerstoneTools.stackPrefetch.enable(element);
 
         if(context.stacks[stackIndex].frameRate !== undefined) {
+            cornerstoneTools.stackPrefetch.disable(element);
             cornerstoneTools.playClip(element, context.stacks[stackIndex].frameRate);
+        }
+        else {
+            cornerstoneTools.stackPrefetch.enable(element);
         }
 
         setOverlays(context, viewportIndex, stackIndex);

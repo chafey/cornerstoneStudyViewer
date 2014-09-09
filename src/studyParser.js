@@ -30,7 +30,8 @@ function parseStudy(study)
             var imageId = image.imageId;
             if(image.numberOfFrames === undefined) {
                 if(image.imageId.substr(0, 4) !== 'http') {
-                    imageId = "dicomweb:/instances/" + image.imageId + '/file';
+                    //imageId = "dicomweb:/instances/" + image.imageId + '/file';
+                    imageId = "dicomweb:/instances/" + image.imageId + '/attachments/dicom/compressed-data';
                 }
             }
             else {

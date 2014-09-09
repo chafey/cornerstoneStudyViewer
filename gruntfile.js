@@ -25,6 +25,7 @@ module.exports = function(grunt) {
             srcjs: {
                 src: [
                     'src/studyParser.js',
+                    'src/normalizedStudyParser.js',
                     'src/thumbnails.js',
                     'src/imageViewer.js',
                     'src/dialogs.js'
